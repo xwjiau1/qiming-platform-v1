@@ -13,10 +13,12 @@ export interface DashboardData {
     completedTasks: number;
     inProgressTasks: number;
     pendingTasks: number;
+    todoCount: number;
   };
   departments: Department[];
   projects: Project[];
   tasks: Task[];
+  todos: any[];
   activities: Activity[];
 }
 

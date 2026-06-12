@@ -10,9 +10,9 @@ dist/
 .env.local
 
 # 数据库文件（生产环境应排除，但演示项目保留）
+*.db-shm
+*.db-wal
 # *.db
-# *.db-shm
-# *.db-wal
 
 # 日志文件
 *.log
