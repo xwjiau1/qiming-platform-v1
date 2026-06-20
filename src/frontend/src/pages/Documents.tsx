@@ -87,7 +87,7 @@ function DocumentRow({ doc, index }: { doc: Document; index: number }) {
           <img src={doc.updatedByAvatar} alt={doc.updatedBy} className="w-5 h-5 rounded-md object-cover" />
         ) : (
           <div className="w-5 h-5 rounded-md bg-surface-secondary flex items-center justify-center">
-            <span className="text-[9px] text-gray-400">{doc.updatedBy[0]}</span>
+            <span className="text-[9px] text-gray-400">{(doc.updatedBy || '?')[0]}</span>
           </div>
         )}
         <span className="text-xs text-gray-400">{doc.updatedBy}</span>

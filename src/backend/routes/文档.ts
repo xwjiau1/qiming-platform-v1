@@ -19,6 +19,10 @@ router.get('/', (req, res) => {
   const rows = db.prepare(sql).all(...params) as any[];
   res.json(successResponse(rows.map((row) => {
     const doc = keysToCamelCase(row);
+    // 字段名映射：后端 updated_by_name → 前端 updatedBy
+    doc.updatedBy = doc.updatedByName || '';
+    doc.updatedByAvatar = doc.updatedByAvatar || '';
+    delete (doc as any).updatedByName;
     delete (doc as any).updatedById; // 前端只需要 updatedBy
     delete (doc as any).updatedAtTs; // 前端只需要 updatedAt
     delete (doc as any).updatedAtMeta; // 内部字段
@@ -31,6 +35,9 @@ router.get('/:id', (req, res) => {
   const row = db.prepare('SELECT * FROM documents WHERE id = ?').get(req.params.id) as any;
   if (!row) return res.status(404).json(errorResponse('文档不存在'));
   const doc = keysToCamelCase(row);
+  doc.updatedBy = doc.updatedByName || '';
+  doc.updatedByAvatar = doc.updatedByAvatar || '';
+  delete (doc as any).updatedByName;
   delete (doc as any).updatedById;
   delete (doc as any).updatedAtTs;
   delete (doc as any).updatedAtMeta;
