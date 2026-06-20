@@ -83,6 +83,7 @@ function TaskCard({
         <div className="flex items-center gap-2">
           {/* 完成/未完成切换按钮 */}
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); onToggleStatus(task); }}
             className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${task.status === 'completed' ? 'text-status-success bg-status-success/10' : 'text-gray-600 hover:text-gray-400 hover:bg-surface-tertiary'}`}
             title={task.status === 'completed' ? '标记为未完成' : '标记为已完成'}
@@ -118,6 +119,7 @@ function ListRow({ task, index, onClick, onDelete, onToggleStatus }: { task: Tas
     >
       <GripVertical className="w-4 h-4 text-gray-700 flex-shrink-0" />
       <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); onToggleStatus(task); }}
         className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer ${task.status === 'completed' ? 'border-status-success bg-status-success/10' : 'hover:brightness-150'}`}
         style={{ borderColor: task.status === 'completed' ? '#30D158' : priority.color }}
@@ -141,6 +143,7 @@ function ListRow({ task, index, onClick, onDelete, onToggleStatus }: { task: Tas
       <span className="text-xs text-gray-600 flex-shrink-0 hidden sm:block">{task.dueDate}</span>
       {/* 删除按钮：hover 时显示 */}
       <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); onDelete(task); }}
         className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
         title="删除任务"
@@ -253,8 +256,8 @@ export default function Tasks() {
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-surface border border-surface-tertiary rounded-lg p-1">
-            <button onClick={() => setViewMode('board')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'board' ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutGrid className="w-4 h-4" />看板</button>
-            <button onClick={() => setViewMode('list')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'list' ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-gray-300'}`}><List className="w-4 h-4" />列表</button>
+            <button type="button" onClick={() => setViewMode('board')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'board' ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-gray-300'}`}><LayoutGrid className="w-4 h-4" />看板</button>
+            <button type="button" onClick={() => setViewMode('list')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${viewMode === 'list' ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-gray-300'}`}><List className="w-4 h-4" />列表</button>
           </div>
           <select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value)} className="h-9 px-3 bg-surface border border-surface-tertiary rounded-lg text-sm text-gray-400 focus:outline-none focus:border-brand-blue">
             <option value="all">全部项目</option>
@@ -267,7 +270,7 @@ export default function Tasks() {
             <option value="low">低优先级</option>
           </select>
         </div>
-        <button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors">
+        <button type="button" onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors">
           <Plus className="w-4 h-4" />新建任务
         </button>
       </div>
@@ -350,7 +353,7 @@ export default function Tasks() {
             <motion.div initial={{ opacity: 0, x: 300 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 300 }} transition={{ duration: 0.3 }} className="fixed right-0 top-0 h-full w-full max-w-md bg-surface border-l border-surface-tertiary z-50 p-6 overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-white">任务详情</h3>
-                <button onClick={() => setDetailTask(null)} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-white hover:bg-surface-secondary transition-colors"><X className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setDetailTask(null)} className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-white hover:bg-surface-secondary transition-colors"><X className="w-4 h-4" /></button>
               </div>
               <div className="space-y-4">
                 <div>
@@ -395,8 +398,8 @@ export default function Tasks() {
                   </div>
                 )}
                 <div className="flex gap-3 pt-4 border-t border-surface-tertiary">
-                  <button onClick={() => { setDetailTask(null); openEdit(detailTask); }} className="flex-1 h-10 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" />编辑</button>
-                  <button onClick={() => { setDetailTask(null); setDeleteTarget(detailTask); }} className="flex-1 h-10 bg-red-500/80 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" />删除</button>
+                  <button type="button" onClick={() => { setDetailTask(null); openEdit(detailTask); }} className="flex-1 h-10 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors flex items-center justify-center gap-1.5"><Edit2 className="w-4 h-4" />编辑</button>
+                  <button type="button" onClick={() => { setDetailTask(null); setDeleteTarget(detailTask); }} className="flex-1 h-10 bg-red-500/80 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5"><Trash2 className="w-4 h-4" />删除</button>
                 </div>
               </div>
             </motion.div>
