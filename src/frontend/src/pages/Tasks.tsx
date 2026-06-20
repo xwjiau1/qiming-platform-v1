@@ -31,13 +31,14 @@ const statusLabels: Record<string, string> = {
 };
 
 function TaskCard({
-  task, index, columnIndex, onDragStart, onClick,
+  task, index, columnIndex, onDragStart, onClick, onToggleStatus,
 }: {
   task: Task;
   index: number;
   columnIndex: number;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onClick: (task: Task) => void;
+  onToggleStatus: (task: Task) => void;
 }) {
   const isBlue = task.departmentColor === 'blue';
   const priority = priorityConfig[task.priority];
@@ -74,18 +75,28 @@ function TaskCard({
         <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-surface-tertiary text-gray-500">{task.type}</span>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-surface-tertiary/50">
         <div className="flex items-center gap-2">
           <img src={task.assigneeAvatar} alt={task.assignee} className="w-5 h-5 rounded-md object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
           <span className="text-xs text-gray-500">{task.assignee}</span>
         </div>
-        <span className="text-[11px] text-gray-600">{task.dueDate}</span>
+        <div className="flex items-center gap-2">
+          {/* 完成/未完成切换按钮 */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggleStatus(task); }}
+            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${task.status === 'completed' ? 'text-status-success bg-status-success/10' : 'text-gray-600 hover:text-gray-400 hover:bg-surface-tertiary'}`}
+            title={task.status === 'completed' ? '标记为未完成' : '标记为已完成'}
+          >
+            <CheckSquare className="w-3.5 h-3.5" />
+          </button>
+          <span className="text-[11px] text-gray-600">{task.dueDate}</span>
+        </div>
       </div>
     </motion.div>
   );
 }
 
-function ListRow({ task, index, onClick }: { task: Task; index: number; onClick: (task: Task) => void }) {
+function ListRow({ task, index, onClick, onDelete, onToggleStatus }: { task: Task; index: number; onClick: (task: Task) => void; onDelete: (task: Task) => void; onToggleStatus: (task: Task) => void }) {
   const isBlue = task.departmentColor === 'blue';
   const priority = priorityConfig[task.priority];
   const status = statusLabels[task.status];
@@ -106,9 +117,14 @@ function ListRow({ task, index, onClick }: { task: Task; index: number; onClick:
       className="flex items-center gap-4 px-4 py-3 hover:bg-surface-secondary transition-colors group border-b border-surface-tertiary/50 last:border-b-0 cursor-pointer"
     >
       <GripVertical className="w-4 h-4 text-gray-700 flex-shrink-0" />
-      <div className="w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center" style={{ borderColor: priority.color }}>
-        {task.status === 'completed' && <div className="w-3 h-3 rounded-sm bg-status-success" />}
-      </div>
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggleStatus(task); }}
+        className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer ${task.status === 'completed' ? 'border-status-success bg-status-success/10' : 'hover:brightness-150'}`}
+        style={{ borderColor: task.status === 'completed' ? '#30D158' : priority.color }}
+        title={task.status === 'completed' ? '标记为未完成' : '标记为已完成'}
+      >
+        {task.status === 'completed' && <CheckSquare className="w-3.5 h-3.5 text-status-success" />}
+      </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className={`text-sm truncate ${task.status === 'completed' ? 'text-gray-600 line-through' : 'text-white group-hover:text-brand-blue-light'} transition-colors`}>{task.title}</p>
@@ -123,6 +139,14 @@ function ListRow({ task, index, onClick }: { task: Task; index: number; onClick:
         <span className="text-xs text-gray-400">{task.assignee}</span>
       </div>
       <span className="text-xs text-gray-600 flex-shrink-0 hidden sm:block">{task.dueDate}</span>
+      {/* 删除按钮：hover 时显示 */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onDelete(task); }}
+        className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
+        title="删除任务"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
     </motion.div>
   );
 }
@@ -178,6 +202,8 @@ export default function Tasks() {
     }
   };
 
+  const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+
   const handleDragStart = useCallback((e: React.DragEvent, taskId: string) => {
     e.dataTransfer.setData('taskId', taskId);
   }, []);
@@ -197,7 +223,16 @@ export default function Tasks() {
     setDragTaskId(null);
   };
 
-  const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+  const handleToggleComplete = async (task: Task) => {
+    const newStatus = task.status === 'completed' ? 'todo' : 'completed';
+    try {
+      await API.tasks.update(task.id, { status: newStatus });
+      toast('success', newStatus === 'completed' ? '任务已完成' : '任务已恢复');
+      refreshTasks();
+    } catch (err: any) {
+      toast('error', '状态更新失败: ' + err.message);
+    }
+  };
 
   const openEdit = (task: any) => {
     setEditingTask(task);
@@ -256,7 +291,7 @@ export default function Tasks() {
                   </div>
                   <div className="space-y-3 flex-1">
                     {colTasks.map((task, index) => (
-                      <TaskCard key={task.id} task={task} index={index} columnIndex={colIndex} onDragStart={handleDragStart} onClick={(t) => setDetailTask(t)} />
+                      <TaskCard key={task.id} task={task} index={index} columnIndex={colIndex} onDragStart={handleDragStart} onClick={(t) => setDetailTask(t)} onToggleStatus={handleToggleComplete} />
                     ))}
                     {colTasks.length === 0 && (
                       <div className="flex items-center justify-center py-8 border border-dashed border-surface-tertiary rounded-xl">
@@ -278,9 +313,10 @@ export default function Tasks() {
               <div className="text-xs text-gray-500 font-medium w-14 text-center">状态</div>
               <div className="text-xs text-gray-500 font-medium hidden lg:block w-20 text-center">负责人</div>
               <div className="text-xs text-gray-500 font-medium hidden sm:block w-16 text-right">截止</div>
+              <div className="w-7 flex-shrink-0" /> {/* 删除按钮占位 */}
             </div>
             {filteredTasks.map((task, index) => (
-              <ListRow key={task.id} task={task} index={index} onClick={(t) => setDetailTask(t)} />
+              <ListRow key={task.id} task={task} index={index} onClick={(t) => setDetailTask(t)} onDelete={setDeleteTarget} onToggleStatus={handleToggleComplete} />
             ))}
             {filteredTasks.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16">

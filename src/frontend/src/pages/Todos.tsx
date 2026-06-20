@@ -90,6 +90,7 @@ export default function Todos() {
             {(['all', 'active', 'completed'] as const).map((f) => (
               <button
                 key={f}
+                type="button"
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-md text-sm transition-all ${
                   filter === f ? 'bg-brand-blue text-white' : 'text-gray-500 hover:text-gray-300'
@@ -105,6 +106,7 @@ export default function Todos() {
         </div>
 
         <button
+          type="button"
           onClick={() => setShowCreateModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors"
         >
@@ -134,6 +136,7 @@ export default function Todos() {
                 }`}
               >
                 <button
+                  type="button"
                   onClick={() => handleToggle(todo)}
                   className="flex-shrink-0 text-gray-500 hover:text-brand-blue transition-colors"
                 >
@@ -165,12 +168,14 @@ export default function Todos() {
 
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
+                    type="button"
                     onClick={() => openEdit(todo)}
                     className="p-1.5 rounded text-gray-500 hover:text-brand-blue hover:bg-surface-secondary transition-colors"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => setDeleteTarget(todo)}
                     className="p-1.5 rounded text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   >

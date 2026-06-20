@@ -47,7 +47,20 @@ app.get('/api/health', (req, res) => {
 // 静态文件：前端构建产物
 const staticPath = path.resolve(__dirname, '../../dist/public');
 if (fs.existsSync(staticPath)) {
-  app.use(express.static(staticPath));
+  app.use(express.static(staticPath, {
+    setHeaders: (res, path) => {
+      // 对 HTML 文件禁用缓存
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      // 对 JS/CSS 文件设置短期缓存（因为文件名有 hash）
+      else if (path.endsWith('.js') || path.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
 } else {
   console.warn('[警告] 前端构建产物目录不存在:', staticPath);
 }
@@ -57,6 +70,9 @@ app.use((req, res) => {
   const indexPath = path.resolve(__dirname, '../../dist/public/index.html');
   if (fs.existsSync(indexPath)) {
     res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     const content = fs.readFileSync(indexPath, 'utf-8');
     return res.send(content);
   }

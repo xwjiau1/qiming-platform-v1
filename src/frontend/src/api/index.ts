@@ -10,7 +10,7 @@ function extractData<T>(json: unknown): T {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}/api${path}`);
+  const res = await fetch(`${BASE}/api${path}`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
   return extractData<T>(json);
@@ -21,6 +21,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
@@ -32,6 +33,7 @@ async function put<T>(path: string, body: unknown): Promise<T> {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
@@ -43,6 +45,7 @@ async function patch<T>(path: string, body: unknown): Promise<T> {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    cache: 'no-store',
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
@@ -50,7 +53,7 @@ async function patch<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function deleteReq<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}/api${path}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE}/api${path}`, { method: 'DELETE', cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
   return extractData<T>(json);

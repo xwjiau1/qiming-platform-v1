@@ -335,7 +335,14 @@ function TodoList({ todos, onToggle, onCreate }: { todos: any[]; onToggle: (todo
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-secondary transition-colors group cursor-pointer"
             onClick={() => onToggle(todo)}
           >
-            <button className="flex-shrink-0 text-gray-500 hover:text-brand-blue transition-colors">
+            <button
+              type="button"
+              className="flex-shrink-0 text-gray-500 hover:text-brand-blue transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle(todo);
+              }}
+            >
               {todo.completed ? (
                 <CheckCircle2 className="w-5 h-5 text-green-400" />
               ) : (
@@ -361,6 +368,7 @@ function TodoList({ todos, onToggle, onCreate }: { todos: any[]; onToggle: (todo
           <ListTodo className="w-8 h-8 text-gray-700 mb-2" />
           <p className="text-xs text-gray-500">暂无待办事项</p>
           <button
+            type="button"
             onClick={onCreate}
             className="mt-2 flex items-center gap-1 px-3 py-1.5 bg-brand-blue text-white text-xs font-medium rounded-lg hover:bg-brand-blue-dark transition-colors"
           >
@@ -521,6 +529,7 @@ function QuickActions({ onNavigate }: { onNavigate: (path: string) => void }) {
         const Icon = action.icon;
         return (
           <button
+            type="button"
             key={action.path}
             onClick={() => onNavigate(action.path)}
             className="flex items-center gap-3 px-4 py-3 bg-surface border border-surface-tertiary rounded-xl hover:border-brand-blue/20 transition-all group"
@@ -544,7 +553,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showTodoCreateModal, setShowTodoCreateModal] = useState(false);
-  const { data: dashboardData } = useDashboard();
+  const { data: dashboardData, refresh: refreshDashboard } = useDashboard();
 
   const departments = dashboardData?.departments || [];
   const projects = dashboardData?.projects || [];
@@ -559,8 +568,7 @@ export default function Dashboard() {
     try {
       await API.todos.toggle(todo.id, !todo.completed);
       toast('success', todo.completed ? '标记为未完成' : '已完成');
-      // 刷新页面数据 — 由于 useDashboard 没有 refresh 方法，我们需要重新加载页面
-      window.location.reload();
+      refreshDashboard();
     } catch (err: any) {
       toast('error', '操作失败: ' + err.message);
     }
@@ -570,7 +578,7 @@ export default function Dashboard() {
     await API.todos.create(data);
     toast('success', '待办创建成功');
     setShowTodoCreateModal(false);
-    window.location.reload();
+    refreshDashboard();
   };
 
   return (
@@ -604,6 +612,7 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-3 mt-5" style={{ opacity: 1 }}>
             <button
+              type="button"
               className="hero-btn flex items-center gap-2 px-4 py-2 bg-brand-blue text-white text-sm font-medium rounded-lg hover:bg-brand-blue-dark transition-colors"
               onClick={() => navigate('/projects')}
             >
@@ -611,6 +620,7 @@ export default function Dashboard() {
               新建项目
             </button>
             <button
+              type="button"
               className="hero-btn flex items-center gap-2 px-4 py-2 bg-surface-secondary border border-surface-tertiary text-gray-300 text-sm font-medium rounded-lg hover:bg-surface-tertiary transition-colors"
               onClick={() => navigate('/tasks')}
             >
@@ -693,6 +703,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-white">项目概览</h3>
           <button
+            type="button"
             onClick={() => navigate('/projects')}
             className="flex items-center gap-1 text-sm text-brand-blue hover:text-brand-blue-light transition-colors"
           >
@@ -727,6 +738,7 @@ export default function Dashboard() {
               </span>
             </div>
             <button
+              type="button"
               onClick={() => setShowTodoCreateModal(true)}
               className="flex items-center gap-1 px-3 py-1.5 bg-brand-blue text-white text-xs font-medium rounded-lg hover:bg-brand-blue-dark transition-colors"
             >
@@ -737,6 +749,7 @@ export default function Dashboard() {
           <TodoList todos={todos} onToggle={handleTodoToggle} onCreate={() => setShowTodoCreateModal(true)} />
           {todos.length > 0 && (
             <button
+              type="button"
               onClick={() => navigate('/todos')}
               className="w-full mt-3 py-2 text-xs text-brand-blue hover:text-brand-blue-light transition-colors border-t border-surface-tertiary"
             >
@@ -748,6 +761,7 @@ export default function Dashboard() {
           <h3 className="text-lg font-medium text-white mb-4 self-start">任务统计</h3>
           <RingChart kpiData={kpiData} />
           <button
+            type="button"
             onClick={() => navigate('/tasks')}
             className="mt-4 flex items-center gap-1 px-4 py-2 bg-brand-blue/10 text-brand-blue text-xs font-medium rounded-lg hover:bg-brand-blue/20 transition-colors"
           >

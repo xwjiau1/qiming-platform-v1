@@ -81,7 +81,11 @@ router.get('/', (req, res) => {
     departments,
     projects,
     tasks: taskRows.map((t) => keysToCamelCase(t)),
-    todos: todoRows.map((t) => keysToCamelCase(t)),
+    todos: todoRows.map((t) => {
+      const todo = keysToCamelCase(t);
+      todo.completed = Boolean(todo.completed);
+      return todo;
+    }),
     activities: activities.map((a) => keysToCamelCase(a)),
   }));
 });
